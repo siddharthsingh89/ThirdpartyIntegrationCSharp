@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExternalDataService.Models.Dto
 {
-    internal class UserPageDto
+    public class UserPageDto
     {
         public int Page { get; set; }
         public int Per_Page { get; set; }

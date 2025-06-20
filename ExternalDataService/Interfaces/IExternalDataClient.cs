@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ExternalDataService.Interfaces
 {
-    internal interface IExternalDataClient
+    public interface IExternalDataClient
     {
-        Task<UserDto?> GetUserByIdAsync(int userId);
-        Task<List<UserDto>> GetAllUsersAsync();
+        public Task<UserDto?> GetUserByIdAsync(int userId);
+        public Task<List<UserDto>> GetAllUsersAsync();
     }
 }
