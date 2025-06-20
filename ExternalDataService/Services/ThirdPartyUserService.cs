@@ -8,16 +8,29 @@ using System.Threading.Tasks;
 
 namespace ExternalDataService.Services
 {
-    internal class ThirdPartyUserService : IExternalDataService
+    public class ThirdPartyUserService : IExternalDataService
     {
-        public Task<IEnumerable<User>> GetAllUsersAsync()
+        private readonly IExternalDataClient _externalDataClient;
+        public ThirdPartyUserService(IExternalDataClient externalDataClient)
         {
-            throw new NotImplementedException();
+            _externalDataClient = externalDataClient;
+        }
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            var userList = await _externalDataClient.GetAllUsersAsync();
+            return userList.Select(Converter.GetUserEntityFromDto);
         }
 
-        public Task<User> GetUserByIdAsync(int userId)
+        public async Task<User> GetUserByIdAsync(int userId)
         {
-            throw new NotImplementedException();
+            var dtoResponse = await _externalDataClient.GetUserByIdAsync(userId);
+            if (dtoResponse == null)
+            {
+                throw new Exception($"User with ID {userId} not found.");
+            }
+
+            return Converter.GetUserEntityFromDto(dtoResponse);
+
         }
     }
 }

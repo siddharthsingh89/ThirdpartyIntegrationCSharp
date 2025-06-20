@@ -23,7 +23,23 @@ namespace ExternalDataService.Client
         }
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
-            throw new NotImplementedException();
+            var allUsers = new List<UserDto>();
+            int page = 1, totalPages;
+
+            do
+            {
+                var response = await _httpClient.GetAsync($"users?page={page}");
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<UserPageDto>(content);
+                if (data?.Data != null)
+                    allUsers.AddRange(data.Data);
+
+                totalPages = data?.Total_Pages ?? 0;
+                page++;
+            } while (page <= totalPages);
+
+            return allUsers;
         }
 
         public async Task<UserDto?> GetUserByIdAsync(int userId)
