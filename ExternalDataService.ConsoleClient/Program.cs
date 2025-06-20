@@ -1,35 +1,41 @@
 ﻿using ExternalDataService.Client;
+using ExternalDataService.Configuration;
 using ExternalDataService.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 namespace ExternalDataService.ConsoleClient
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            IExternalDataClient client = new ExternalDataClient();
-            Console.WriteLine("Checking GetUserbyId");
-            var user = client.GetUserByIdAsync(2).GetAwaiter().GetResult();
-            Console.WriteLine($"User ID: {user?.Id}, Name: {user?.FirstName} {user?.LastName}, Email: {user?.Email}");
+            
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
 
+        
+            var services = new ServiceCollection();
+            services.AddDataServiceIntegration(configuration);
+            var provider = services.BuildServiceProvider();
 
-           
-            Console.WriteLine("Checking ListAllusers");
-            var userList = client.GetAllUsersAsync().GetAwaiter().GetResult();
-            userList.ForEach(u => 
+         
+            var userService = provider.GetRequiredService<IExternalDataService>();
+
+         
+            var user = await userService.GetUserByIdAsync(2);
+
+            if (user != null)
             {
-                Console.WriteLine($"User ID: {u.Id}, Name: {u.FirstName} {u.LastName}, Email: {u.Email}");
-            });
-
-            IExternalDataService service = new ExternalDataService.Services.ThirdPartyUserService(client);
-            Console.WriteLine("Checking GetUserById from service");
-            var userFromService = service.GetUserByIdAsync(2).GetAwaiter().GetResult();
-            Console.WriteLine($"User ID: {userFromService.Id}, Name: {userFromService.FirstName} {userFromService.LastName}, Email: {userFromService.Email}");
-            var allUsersFromService = service.GetAllUsersAsync().GetAwaiter().GetResult();
-            Console.WriteLine("Checking ListAllUsers from service");
-            allUsersFromService.ToList().ForEach(u => 
+                Console.WriteLine($"ID: {user.Id}");
+                Console.WriteLine($"Name: {user.FirstName} {user.LastName}");
+                Console.WriteLine($"Email: {user.Email}");
+            }
+            else
             {
-                Console.WriteLine($"User ID: {u.Id}, Name: {u.FirstName} {u.LastName}, Email: {u.Email}");
-            });
+                Console.WriteLine("User not found.");
+            }
 
         }
     }

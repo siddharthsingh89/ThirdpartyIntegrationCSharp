@@ -14,12 +14,10 @@ namespace ExternalDataService.Client
     {
         private readonly HttpClient _httpClient;
 
-        public ExternalDataClient()
+        public ExternalDataClient(HttpClient httpClient)
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://reqres.in/api/");
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Add("x-api-key", "reqres-free-v1");
+           _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+         
         }
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
@@ -56,8 +54,7 @@ namespace ExternalDataService.Client
 
             }
             else
-            {
-                // Handle error response, e.g., log it or throw an exception
+            {                
                 return null;
             }
         }
