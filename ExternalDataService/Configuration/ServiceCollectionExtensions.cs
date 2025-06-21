@@ -3,6 +3,7 @@ using ExternalDataService.Interfaces;
 using ExternalDataService.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using System;
@@ -13,7 +14,12 @@ namespace ExternalDataService.Configuration
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddDataServiceIntegration(this IServiceCollection services, IConfiguration configuration)
-        {         
+        {
+            services.AddLogging(configure =>
+            {
+                configure.AddConsole();
+                configure.SetMinimumLevel(LogLevel.Information);
+            });
             services.Configure<ApiSettings>(configuration.GetSection("ApiSettings"));
             services.Configure<CacheSettings>(configuration.GetSection("CacheSettings"));
             services.AddMemoryCache();

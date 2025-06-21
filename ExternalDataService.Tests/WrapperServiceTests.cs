@@ -4,6 +4,7 @@ using ExternalDataService.Models;
 using ExternalDataService.Models.Dto;
 using ExternalDataService.Services;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -29,7 +30,11 @@ namespace ExternalDataService.Tests
 
             var mockCache = new Mock<IMemoryCache>();
             var mockCacheSettings = new Mock<IOptions<CacheSettings>>();
-            var service = new ThirdPartyUserService(mockClient.Object, mockCache.Object, mockCacheSettings.Object);
+            var mockLogger = new Mock<ILogger<ThirdPartyUserService>>();
+            var service = new ThirdPartyUserService(mockClient.Object,
+                mockCache.Object,
+                mockCacheSettings.Object,
+                mockLogger.Object);
 
             var result = (await service.GetAllUsersAsync()).ToList();
 
@@ -48,7 +53,11 @@ namespace ExternalDataService.Tests
 
             var mockCache = new Mock<IMemoryCache>();
             var mockCacheSettings = new Mock<IOptions<CacheSettings>>();
-            var service = new ThirdPartyUserService(mockClient.Object, mockCache.Object, mockCacheSettings.Object);
+            var mockLogger = new Mock<ILogger<ThirdPartyUserService>>();
+            var service = new ThirdPartyUserService(mockClient.Object,
+                 mockCache.Object,
+                 mockCacheSettings.Object,
+                 mockLogger.Object);
 
             var result = await service.GetUserByIdAsync(2);
 
@@ -66,7 +75,11 @@ namespace ExternalDataService.Tests
 
             var mockCache = new Mock<IMemoryCache>();
             var mockCacheSettings = new Mock<IOptions<CacheSettings>>();
-            var service = new ThirdPartyUserService(mockClient.Object, mockCache.Object, mockCacheSettings.Object);
+            var mockLogger = new Mock<ILogger<ThirdPartyUserService>>();
+            var service = new ThirdPartyUserService(mockClient.Object,
+                mockCache.Object,
+                mockCacheSettings.Object,
+                mockLogger.Object);
 
             var ex = await Assert.ThrowsExceptionAsync<Exception>(() => service.GetUserByIdAsync(99));
             Assert.IsTrue(ex.Message.Contains("User with ID 99 not found."));
