@@ -42,6 +42,56 @@ ExternalDataService is a Class Library designed to integrate with third-party us
 - Configuration: Uses a configuration settings to manage API endpoints and cache eviction policies, allowing for easy adjustments without code changes.
 
 
+- ### Transient Error Handling
+
+Transient errors (such as network timeouts, temporary unavailability, or HTTP 5xx errors) are handled using the Pollylibrary. The solution configures retry and timeout policies for all HTTP requests made by the `ExternalDataClient`:
+
+- **Retry Policy:**  
+  The HTTP client is configured to automatically retry failed requests according to the policy defined in `RetryConfiguration.cs`. This typically includes retries for transient HTTP errors (like 408, 5xx, and network failures).
+
+- **Timeout Policy:**  
+  A timeout policy is also applied to each HTTP request, ensuring that requests do not hang indefinitely. The default timeout is set to 10 seconds.
+
+- **Configuration Location:**  
+  These policies are registered in `ServiceCollectionExtensions.cs` using the `AddPolicyHandler` method when setting up the HTTP client.
+
+- **Error Handling in Code:**  
+  In addition to Polly policies, the `ExternalDataClient` class includes try-catch blocks to handle exceptions such as `TaskCanceledException` (for timeouts), `HttpRequestException` (for HTTP errors), and `JsonException` (for deserialization errors). Errors are logged to the console, and the methods return `null` or empty results as appropriate.
+
+- **Do not Retry on 4xx Errors:**  
+  The retry policy does not apply to 4xx errors (client errors) as these indicate issues with the request itself, such as invalid parameters or unauthorized access. The client will log these errors and return null or an empty result without retrying.
+### Demo Command-Line Utility
+
+A demo command-line utility (`ExternalDataService.ConsoleClient`) is included to test the library. This utility provides user management commands via the command line.
+
+#### Command List
+
+- **users get < id >**  
+  Fetch a user by their ID.
+
+ ```
+ ExternalDataService.ConsoleClient.exe users get <id>
+ ```
+
+ Example:
+ ```
+ ExternalDataService.ConsoleClient.exe users get 2
+  ```
+
+  ![Get User Command Placeholder](images/getuser.png)
+
+
+  - **users list**  
+  List all users.
+
+Example
+```
+ExternalDataService.ConsoleClient.exe users list
+```
+
+![List Users Command Placeholder](images/allusers.png)
+
+
 ### Contact
 
 
